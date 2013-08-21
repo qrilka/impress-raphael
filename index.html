@@ -4,8 +4,10 @@
     <title>Impress Tutorial</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link href="css/impress-demo.css" rel="stylesheet" />
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="js/raphael-min.js" charset="utf-8"></script>
+    <style type="text/css">
+#spin {width:200px;height:200px;}
+    </style>
   </head>
   <body>
     <div id="impress">
@@ -26,7 +28,7 @@
     <script src="js/impress.js"></script>
     <script type="text/javascript">
       impress().init();
-      var p;
+      var r;
       document.addEventListener("impress:stepenter", function(e) {
         if (e.target.id == "step-3") {
           r = new Raphael('spin', 200, 200);
@@ -38,19 +40,14 @@
                                         "60%":{transform: "t50,90"},
                                         "100%":{transform: "t100,0"}}, 5000).repeat(Infinity);
           rect.animate(anim);
-          console.log(d3.select("#" + e.target.id));
-          p = d3.select("#" + e.target.id).selectAll("p").data([4, 8, 15]);
-          p.enter().append("p").transition().delay(function (d,i) { return i * 100; })
-           .text(function(d) { return "I’m number " + d + "!"; });
           console.log("done");
         } else {
           console.log(e.target.id);
         }
       });
       document.addEventListener("impress:stepleave", function(e) {
-        if (e.target.id == "step-3" && p) {
+        if (e.target.id == "step-3" && r) {
           r.remove();
-          p.transition().delay(function (d,i) { return i * 100; }).remove();
           console.log("done remove");
         } else {
           console.log(e.target.id);
