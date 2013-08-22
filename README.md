@@ -1,4 +1,4 @@
-impress-raphael
+impress-animation
 ==========
 
-Sample presentation combining impress.js and animation using Raphaël
+Sample presentation combining impress.js and js animation 

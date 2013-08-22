@@ -1,25 +1,54 @@
 <!doctype html>
 <html>
   <head>
-    <title>Impress.js + Raphaël animation</title>
+    <title>Impress.js + animations</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link href="css/impress-demo.css" rel="stylesheet" />
     <script src="js/raphael-min.js" charset="utf-8"></script>
+    <script src="js/move.min.js" charset="utf-8"></script>
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="js/jstween-1.1.min.js" charset="utf-8"></script>
+    <script src="http://code.createjs.com/easeljs-0.6.1.min.js"></script>
+    <script src="http://code.createjs.com/tweenjs-0.4.1.min.js"></script>
     <style type="text/css">
-#spin {width:500px;height:300px;}
+#spin, canvas {width:500px;height:300px;}
+canvas{position:absolute;left:0;top:0}
+.bg{background-image:url('img/bg.png');width:500px;height:300px;position:relative}
+.pkt1{background-image:url('img/pkt1.png');width:10px;height:10px;position:absolute;}
     </style>
   </head>
   <body>
     <div id="impress">
       <div class="step" data-x="0" data-y="0">
-        Sample presentation
+        Sample presentation title
       </div>
       <div class="step" data-x="500" data-y="-800" data-scale="0.5">
-        Next step will show some animation
+        Next steps will show some js animation variants
       </div>
       <div class="step" data-x="0" data-y="-800" data-rotate="90">
-        Animation?
+        Animation with Raphaël in svg
         <div id='spin'></div>
+      </div>
+      <div class="step" data-x="-200" data-y="-800" data-rotate="-45">
+        Animation with move.js
+        <div class='bg'>
+          <div id="pkt1" class="pkt1"></div>
+        </div>
+      </div>
+      <div class="step" data-x="-200" data-y="800" data-rotate="45">
+        Animation with JSTween
+        <div class="bg">
+          <div id="pkt2" class="pkt1"></div>
+        </div>
+        not sure how to insert looping
+      </div>
+      <div class="step" data-x="200" data-y="400" data-rotate="180">
+        Animation with TweenJS
+        <div class="bg">
+          <canvas id="tweenCanvas" width="500" height="300">
+			<p>Your browser is sooooo old ! Download a modern one now !</p>
+		  </canvas>
+        </div>
       </div>
       <div class="step" data-x="1000" data-y="0">
         Finita la comedia
@@ -28,7 +57,12 @@
     <script src="js/impress.js"></script>
     <script type="text/javascript">
       impress().init();
-      var r;
+      var r, stage, pkt3DE, stopMoveJs = false;
+
+      // tweenJs
+      canvas = document.getElementById("tweenCanvas");
+      stage = new createjs.Stage(canvas);      
+
       document.addEventListener("impress:stepenter", function(e) {
         if (e.target.id == "step-3") {
           r = new Raphael('spin', 500, 300);
@@ -69,11 +103,121 @@
                                           }, 10000)
                               .delay(500)
                               .repeat(Infinity));
+        } else if (e.target.id == "step-4") {
+          stopMoveJs = false;
+          var move2 = function() {
+            move('#pkt1')
+            .translate(-200)
+            .end(move1);
+          }
+          var move1 = function() {
+            move('#pkt1')
+            .translate(200)
+            .duration('3s')
+            .end(function() {
+              console.log(stopMoveJs);
+              if (!stopMoveJs) {
+                move2();
+              }
+             });
+          }
+          move1();
+        } else if (e.target.id == "step-5") {
+          var tw2 = $('#pkt2').tween({left:{start:100,stop:0, time: 1,duration:2}});
+          var tw = $('#pkt2').tween({left:{start:0,stop:100,time:0,duration:1,onStop:function(){
+            tw2.play()
+          }}})
+          tw.play();
+        } else if (e.target.id == "step-6") {
+          var pkt1 = new createjs.Shape();
+          pkt1.graphics.setStrokeStyle(1, 'round', 'round');
+          pkt1.graphics.beginStroke(('#000000'));
+          pkt1.graphics.beginFill("#0000FF").drawCircle(0,0,5);
+          pkt1.graphics.endStroke();
+          pkt1.graphics.endFill();
+          pkt1.x = 90;
+          pkt1.y = 40;
+          var tween = createjs.Tween.get(pkt1, {loop:true})
+                       .to({x:230, y:125}, 1500)
+                       .wait(200)
+                       .to({x:270}, 500)
+                       .wait(200)
+                       .to({x:410, y:75}, 1500)
+                       .wait(500);
+
+          stage.addChild(pkt1);
+
+          var pkt2 = new createjs.Shape();
+          pkt2.graphics.setStrokeStyle(1, 'round', 'round');
+          pkt2.graphics.beginStroke(('#000000'));
+          pkt2.graphics.beginFill("#FF0000").drawCircle(0,0,5);
+          pkt2.graphics.endStroke();
+          pkt2.graphics.endFill();
+          pkt2.x = 90;
+          pkt2.y = 220;
+/*
+"0%":{transform: "t0,0"},
+                                          "10%":{transform: "t140,-75"},
+                                          "20%":{transform: "t180,-70"},
+                                          "30%":{transform: "t330,-10"},
+                                          "31%":{transform: "t330,-10", opacity: 0},
+                                          "44%":{transform: "t0,0", opacity: 0},
+                                          "45%":{transform: "t0,0", opacity: 1},
+                                          "55%":{transform: "t140,-75"},
+                                          "65%":{transform: "t180,-70"},
+                                          "75%":{transform: "t330,-130"},
+                                          "76%":{transform: "t330,-130", opacity: 0},
+                                          "99%":{transform: "t0,0", opacity: 0},
+                                          "100%":{transform: "t0,0", opacity: 1},
+*/
+          var tween = createjs.Tween.get(pkt2, {loop:true})
+                       .to({x:230, y:145}, 1500)
+                       .wait(300)
+                       .to({x:270, y:150}, 500)
+                       .wait(150)
+                       .to({x:410, y:95}, 1500)
+                       .to({alpha:0})
+                       .wait(500)
+                       .to({alpha:1})
+                       .to({x:90, y:220})
+                       .wait(200)
+                       .to({x:230, y:145}, 1500)
+                       .wait(250)
+                       .to({x:270, y:150}, 500)
+                       .wait(100)
+                       .to({x:410, y:210}, 1500);
+
+          stage.addChild(pkt2);
+
+          createjs.Ticker.addEventListener("tick", stage);
+/*
+          pkt3 = document.getElementById('pkt3');
+          pkt3DE = new DOMElement(pkt3);
+          pkt3DE.regX = 0;
+          pkt3DE.regY = 0;
+          pkt3DE.x = 200
+          pkt3DE.y = -100;
+          console.log(pkt3DE);
+          stage = new Stage(canvas);
+          stage.addChild(pkt3DE);
+          Ticker.setFPS(24);
+          Ticker.addListener(stage);
+          Tween.get(pkt3DE).to({alpha:1, x:300, y:200},2000).call(function() {
+            stage.removeChild(pkt3DE);
+          });
+*/
         }
       });
       document.addEventListener("impress:stepleave", function(e) {
+        console.log("leave", e.target.id);
         if (e.target.id == "step-3" && r) {
           r.remove();
+        } else if (e.target.id == "step-4") {
+          console.log("stopping");
+          stopMoveJs = true;
+        } else if (e.target.id == "step-6") {
+          stage.removeAllChildren();
+          createjs.Ticker.removeAllListeners();
         }
       });
     </script>
