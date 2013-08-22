@@ -1,4 +1,4 @@
-impress-d3
+impress-raphael
 ==========
 
-Sample presentation combining impress.js and D3
+Sample presentation combining impress.js and animation using Raphaël
