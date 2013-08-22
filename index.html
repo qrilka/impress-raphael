@@ -6,7 +6,7 @@
     <link href="css/impress-demo.css" rel="stylesheet" />
     <script src="js/raphael-min.js" charset="utf-8"></script>
     <style type="text/css">
-#spin {width:200px;height:200px;}
+#spin {width:500px;height:300px;}
     </style>
   </head>
   <body>
@@ -31,26 +31,49 @@
       var r;
       document.addEventListener("impress:stepenter", function(e) {
         if (e.target.id == "step-3") {
-          r = new Raphael('spin', 200, 200);
-          var rect = r.rect(10,10,50,50).attr({fill:'red'});
-          var anim = Raphael.animation({"0%":{transform: "t100,0"},
-                                        "25%":{transform: "t10,90r180"},
-                                        "50%":{transform: "t10,90"},
-                                        "60%":{transform: "t10,90r50"},
-                                        "60%":{transform: "t50,90"},
-                                        "100%":{transform: "t100,0"}}, 5000).repeat(Infinity);
-          rect.animate(anim);
-          console.log("done");
-        } else {
-          console.log(e.target.id);
+          r = new Raphael('spin', 500, 300);
+          r.rect(0, 0, 500, 300).attr({fill: 'white'});
+          var workstation = r.image('img/workstation.jpg', 50, 30, 40, 40);
+          workstation.clone().attr({y: 125});
+          workstation.clone().attr({y: 210});
+          var server = r.image('img/www server.jpg', 420, 60, 40, 40);
+          server.clone().attr({y: 180});
+          var sw = r.image('img/workgroup switch.jpg', 230, 125, 40, 40);
+          r.path(["M90,50L230,135",
+                  "M90,145L225,145",
+                  "M90,230L225,155"]);
+          r.path(["M420,80L275,135",
+                  "M420,200L275,145"]);
+          var pkt1 = r.circle(90, 40, 4).attr({fill: 'blue'});
+          pkt1.animate(Raphael.animation({"0%":{transform: "t0,0"},
+                                          "25%":{transform: "t140,85"},
+                                          "50%":{transform: "t180,85"},
+                                          "75%":{transform: "t330,30"},
+                                          "76%":{transform: "t330,30", opacity: 0},
+                                          "99%":{transform: "t0,0", opacity: 0},
+                                          "100%":{transform: "t0,0", opacity: 1}}, 5000).repeat(Infinity));
+          var pkt2 = pkt1.clone().attr({cy:220, fill: 'magenta'});
+          pkt2.animate(Raphael.animation({"0%":{transform: "t0,0"},
+                                          "10%":{transform: "t140,-75"},
+                                          "20%":{transform: "t180,-70"},
+                                          "30%":{transform: "t330,-10"},
+                                          "31%":{transform: "t330,-10", opacity: 0},
+                                          "44%":{transform: "t0,0", opacity: 0},
+                                          "45%":{transform: "t0,0", opacity: 1},
+                                          "55%":{transform: "t140,-75"},
+                                          "65%":{transform: "t180,-70"},
+                                          "75%":{transform: "t330,-130"},
+                                          "76%":{transform: "t330,-130", opacity: 0},
+                                          "99%":{transform: "t0,0", opacity: 0},
+                                          "100%":{transform: "t0,0", opacity: 1},
+                                          }, 10000)
+                              .delay(500)
+                              .repeat(Infinity));
         }
       });
       document.addEventListener("impress:stepleave", function(e) {
         if (e.target.id == "step-3" && r) {
           r.remove();
-          console.log("done remove");
-        } else {
-          console.log(e.target.id);
         }
       });
     </script>
